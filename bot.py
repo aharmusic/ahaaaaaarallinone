@@ -156,7 +156,7 @@ async def upload_video(client: Client, message: Message, video_path: str, captio
 async def start_command(client, message):
     if await check_membership(client, message):
         await message.reply_text(
-            "**Welcome to Ahar All-In-One Bot!**\n\nUse /help to see all available commands.",
+            "**Welcome to Ahar All-In-One Bot!**\n\nUse /help to see all available commands.\n\n{Only can download files less than 2GB}",
             quote=True
         )
 
