@@ -1,1 +1,1 @@
-web: docker build -t myapp . && docker run -p 8000:8000 myapp
+web: bash -c "apt-get update && apt-get install -y libgl1-mesa-glx && python run.py"
