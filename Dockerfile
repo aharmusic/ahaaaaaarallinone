@@ -1,16 +1,17 @@
-FROM python:3.13-slim
+FROM python:3.12-slim
 
-# Install OpenGL (libGL) dependencies
-RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
-    && rm -rf /var/lib/apt/lists/*
+# Install system dependencies
+RUN apt-get update && apt-get install -y libgl1-mesa-glx && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-
-# Copy the rest of your application
-COPY . /app
+# Set working dir
 WORKDIR /app
 
+# Copy dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy source code
+COPY . .
+
+# Default command (overridable by Procfile)
 CMD ["python", "run.py"]
