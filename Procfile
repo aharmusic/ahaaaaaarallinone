@@ -1,1 +1,1 @@
-web: python -m spotdl --download-ffmpeg && mv .spotdl-cache/ffmpeg ffmpeg && chmod +x ffmpeg && export PATH=$PATH:$(pwd) && python bot.py
+web: python -m spotdl --download-ffmpeg && mv /app/.spotdl/ffmpeg /app/ffmpeg && chmod +x /app/ffmpeg && export PATH=$PATH:/app && python bot.py
