@@ -7,3 +7,4 @@ opencv-python-headless
 libtorrent
 flask
 thread
+spotdl
