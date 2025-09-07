@@ -24,9 +24,8 @@ API_HASH = "5bb178e8905d57f05954c5d5ff263785"
 BOT_TOKEN = "7073247917:AAGNOZDBzCMxjhaKukHlmCT90TGezix_jvE"  # REGENERATE this later!
 
 # --- CHANNELS ---
-# Bot must be an admin in these if they are channels/supergroups.
+# Bot must be an admin in this channel for force-sub to work.
 FORCE_SUB_CHANNEL = "@trrrytgch"
-UPLOAD_CHANNEL = "@trrrytgch"
 
 # --- PATHS ---
 DOWNLOAD_DIRECTORY = "./downloads"
@@ -109,7 +108,7 @@ async def check_membership(client: Client, message: Message) -> bool:
 
 
 # -------- 2) Upload video helper --------
-async def upload_video(client: Client, message: Message, video_path: str, caption: str, thumb_path: str = None):
+async def upload_video(client: Client, message: Message, chat_id: int, video_path: str, caption: str, thumb_path: str = None):
     status_message = await message.reply_text("Extracting video metadata...", quote=True)
 
     # --- Add user info ---
@@ -142,17 +141,15 @@ async def upload_video(client: Client, message: Message, video_path: str, captio
                 percentage = current * 100 / total
                 bar = progress_bar(percentage)
                 try:
-                    await status_message.edit_text(f"**Uploading to Channel...**\n{bar}")
-                except ChatWriteForbidden:
-                    pass  # Can't edit message in the other chat
+                    await status_message.edit_text(f"**Uploading...**\n{bar}")
                 except Exception:
                     pass
                 last_update_time = now
 
     try:
-        await status_message.edit_text("Starting upload to channel…")
+        await status_message.edit_text("Starting upload…")
         await client.send_video(
-            chat_id=UPLOAD_CHANNEL,
+            chat_id=chat_id,  # MODIFIED: Send to the user's chat
             video=video_path,
             caption=final_caption,
             duration=duration or None,
@@ -162,7 +159,7 @@ async def upload_video(client: Client, message: Message, video_path: str, captio
             supports_streaming=True,
             progress=progress
         )
-        await status_message.edit_text("✅ **Upload complete!**\nFile sent to the channel. @trrrytgch")
+        await status_message.edit_text("✅ **Upload complete!**")
     except Exception as e:
         print(f"[upload_video] Upload failed: {e}")
         await status_message.edit_text(f"❌ **Upload Failed!**\n\nError: `{e}`")
@@ -314,7 +311,8 @@ async def torrent_handler(client, message):
             file_name = os.path.basename(file_path)
             if file_name.endswith(('.!qB', '.parts')): continue  # Skip temp files
             upload_caption = f"**Downloaded via Torrent:**\n`{file_name}`"
-            await upload_video(client, message, file_path, caption=upload_caption)
+            # MODIFIED: Pass message.chat.id to send the file to the user
+            await upload_video(client, message, message.chat.id, file_path, caption=upload_caption)
 
         await status_message.edit_text("✅ **All torrent uploads complete!**")
 
@@ -448,7 +446,8 @@ async def youtube_handler(client, message):
         caption = f"🎬 **{title}**\n👤 **Uploader:** {uploader}\n👀 **Views:** {views:,}"
 
         await status_message.edit_text("Preparing to upload…")
-        await upload_video(client, message, video_path, caption, final_thumb_path)
+        # MODIFIED: Pass message.chat.id to send the file to the user
+        await upload_video(client, message, message.chat.id, video_path, caption, final_thumb_path)
     except CancelledError:
         await status_message.edit_text("🚫 **Download Canceled!**")
     except Exception as e:
@@ -529,7 +528,8 @@ async def url_handler(client, message):
 
         file_basename = os.path.basename(output_path)
         await status_message.edit_text(f"**Download complete:** `{file_basename}`\n\nNow preparing to upload…")
-        await upload_video(client, message, output_path, caption=f"**Downloaded from URL:**\n`{file_basename}`")
+        # MODIFIED: Pass message.chat.id to send the file to the user
+        await upload_video(client, message, message.chat.id, output_path, caption=f"**Downloaded from URL:**\n`{file_basename}`")
     except CancelledError:
         await status_message.edit_text("🚫 **Download Canceled!**")
     except Exception as e:
