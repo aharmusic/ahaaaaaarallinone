@@ -159,7 +159,7 @@ async def upload_video(client: Client, message: Message, chat_id: int, video_pat
             supports_streaming=True,
             progress=progress
         )
-        await status_message.edit_text("✅ **Upload complete!**")
+        await status_message.edit_text("✅ **Upload complete!** \nUse this bot to download high Quality Youtube videos @bfilestbot")
     except Exception as e:
         print(f"[upload_video] Upload failed: {e}")
         await status_message.edit_text(f"❌ **Upload Failed!**\n\nError: `{e}`")
